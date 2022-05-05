@@ -13,8 +13,75 @@
     <Property Name="Date" Type="DateTime" Precision="3" />
     <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="Category" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="OrdernDetails" Relationship="ProductsModel.FK_OrdernDetails_Products" FromRole="Products" ToRole="OrdernDetails" />
   </EntityType>
   <EntityContainer Name="ProductsContext" annotation:LazyLoadingEnabled="true">
     <EntitySet Name="Products" EntityType="Self.Products" />
+    <EntitySet Name="Orders" EntityType="ProductsModel.Orders" />
+    <EntitySet Name="sysdiagrams" EntityType="ProductsModel.sysdiagrams" />
+    <EntitySet Name="OrdernDetails" EntityType="ProductsModel.OrdernDetails" />
+    <AssociationSet Name="FK_OrdernDetails_Orders" Association="ProductsModel.FK_OrdernDetails_Orders">
+      <End Role="Orders" EntitySet="Orders" />
+      <End Role="OrdernDetails" EntitySet="OrdernDetails" />
+    </AssociationSet>
+    <AssociationSet Name="FK_OrdernDetails_Products" Association="ProductsModel.FK_OrdernDetails_Products">
+      <End Role="Products" EntitySet="Products" />
+      <End Role="OrdernDetails" EntitySet="OrdernDetails" />
+    </AssociationSet>
   </EntityContainer>
+  <EntityType Name="Orders">
+    <Key>
+      <PropertyRef Name="Order_ID" />
+    </Key>
+    <Property Name="Order_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Address" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="OrderDate" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="OrdernDetails" Relationship="ProductsModel.FK_OrdernDetails_Orders" FromRole="Orders" ToRole="OrdernDetails" />
+  </EntityType>
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <EntityType Name="OrdernDetails">
+    <Key>
+      <PropertyRef Name="OrderDetail_ID" />
+    </Key>
+    <Property Name="OrderDetail_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Product_ID" Type="Int32" Nullable="false" />
+    <Property Name="Order_ID" Type="Int32" Nullable="false" />
+    <Property Name="Quantity" Type="Int32" Nullable="false" />
+    <Property Name="Price" Type="Decimal" Nullable="false" Precision="10" Scale="2" />
+    <NavigationProperty Name="Orders" Relationship="ProductsModel.FK_OrdernDetails_Orders" FromRole="OrdernDetails" ToRole="Orders" />
+    <NavigationProperty Name="Products" Relationship="ProductsModel.FK_OrdernDetails_Products" FromRole="OrdernDetails" ToRole="Products" />
+  </EntityType>
+  <Association Name="FK_OrdernDetails_Orders">
+    <End Type="ProductsModel.Orders" Role="Orders" Multiplicity="1" />
+    <End Type="ProductsModel.OrdernDetails" Role="OrdernDetails" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Orders">
+        <PropertyRef Name="Order_ID" />
+      </Principal>
+      <Dependent Role="OrdernDetails">
+        <PropertyRef Name="Order_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_OrdernDetails_Products">
+    <End Type="ProductsModel.Products" Role="Products" Multiplicity="1" />
+    <End Type="ProductsModel.OrdernDetails" Role="OrdernDetails" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Products">
+        <PropertyRef Name="Product_ID" />
+      </Principal>
+      <Dependent Role="OrdernDetails">
+        <PropertyRef Name="Product_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema>
