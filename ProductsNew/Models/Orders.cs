@@ -23,10 +23,9 @@ namespace ProductsNew.Models
         public int Order_ID { get; set; }
         public string Address { get; set; }
         public Nullable<System.DateTime> OrderDate { get; set; }
+        public Nullable<decimal> TotalPrice { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<OrdernDetails> OrdernDetails { get; set; }
-
-       // public IEnumerable <OrdernDetails> Details { get; set; }
     }
 }

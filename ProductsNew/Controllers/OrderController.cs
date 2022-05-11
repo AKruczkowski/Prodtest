@@ -14,7 +14,14 @@ namespace ProductsNew.Controllers
     public class OrderController : ApiController
     {
         ProductsContext productsContext = new ProductsContext();
-        Service service = new Service();
+        //Service service = new Service();
+        private IService _iservice;
+
+        public OrderController(IService iservice)
+        {
+            _iservice = iservice;
+        }
+
 
         public HttpResponseMessage GetOrders()
         {

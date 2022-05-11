@@ -29,6 +29,7 @@ namespace ProductsNew.Models
         public Nullable<System.DateTime> Date { get; set; }
         public string Description { get; set; }
         public string Category { get; set; }
+        public Nullable<decimal> ShippingPrice { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<OrdernDetails> OrdernDetails { get; set; }

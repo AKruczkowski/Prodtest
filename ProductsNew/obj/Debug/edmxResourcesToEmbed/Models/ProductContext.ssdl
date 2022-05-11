@@ -17,6 +17,7 @@
     <Property Name="Order_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Address" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="OrderDate" Type="datetime" />
+    <Property Name="TotalPrice" Type="decimal" Precision="10" Scale="2" />
   </EntityType>
   <EntityType Name="Products">
     <Key>
@@ -31,6 +32,7 @@
     <Property Name="Date" Type="datetime" />
     <Property Name="Description" Type="nvarchar" MaxLength="50" />
     <Property Name="Category" Type="nvarchar" MaxLength="50" />
+    <Property Name="ShippingPrice" Type="decimal" Precision="10" Scale="2" />
   </EntityType>
   <EntityType Name="sysdiagrams">
     <Key>

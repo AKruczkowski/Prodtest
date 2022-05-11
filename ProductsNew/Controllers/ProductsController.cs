@@ -6,6 +6,8 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Autofac;
+//using System.Globalization;
 
 namespace ProductsNew.Controllers
 {
@@ -15,7 +17,12 @@ namespace ProductsNew.Controllers
     {
 
         ProductsContext productsContext = new ProductsContext();
+        private IService _iservice;
 
+        public ProductsController(IService iservice)
+        {
+            _iservice = iservice;
+        }
 
         // GET: api/Products
         [Route("GetProducts")]
@@ -54,10 +61,11 @@ namespace ProductsNew.Controllers
             {
                 //
                 productsContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Products ON");
+                product.ShippingPrice = _iservice.EstimatePrice(_iservice.EstimateVolume(product.Height??0, product.Length??0, product.Width??0));
                 productsContext.Products.Add(product);
                 productsContext.SaveChanges();
                 productsContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Products OFF");
-
+                //_iservice.EstimateVolume
 
                 var message = Request.CreateResponse(HttpStatusCode.Created, product);
                 message.Headers.Location = new Uri(Request.RequestUri + "/"+ product.Product_ID.ToString());
@@ -96,6 +104,8 @@ namespace ProductsNew.Controllers
                     result.Date = DateTime.Now;
                     result.Category = value.Category;
 
+                    result.ShippingPrice = _iservice.EstimatePrice(_iservice.EstimateVolume(result.Height ?? 0, result.Length ?? 0, result.Width ?? 0));
+
                     productsContext.SaveChanges();
 
                     return Request.CreateResponse(HttpStatusCode.OK, result);
@@ -130,15 +140,6 @@ namespace ProductsNew.Controllers
             {
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);  
             }
-           // productsContext.Products.Remove(productsContext.Products.FirstOrDefault(e => e.Product_ID == id));
-
-
         }
-        //public void Delete(int id)
-        //{
-        //    productsContext.Products.Remove(productsContext.Products.FirstOrDefault(e => e.Product_ID == id));
-
-        //    productsContext.SaveChanges();
-        //}
     }
 }

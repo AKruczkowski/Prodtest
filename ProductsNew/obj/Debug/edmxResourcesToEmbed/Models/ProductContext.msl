@@ -4,6 +4,7 @@
     <EntitySetMapping Name="Products">
       <EntityTypeMapping TypeName="ProductsModel.Products">
         <MappingFragment StoreEntitySet="Products">
+          <ScalarProperty Name="ShippingPrice" ColumnName="ShippingPrice" />
           <ScalarProperty Name="Product_ID" ColumnName="Product_ID" />
           <ScalarProperty Name="Name" ColumnName="Name" />
           <ScalarProperty Name="Price" ColumnName="Price" />
@@ -19,6 +20,7 @@
     <EntitySetMapping Name="Orders">
       <EntityTypeMapping TypeName="ProductsModel.Orders">
         <MappingFragment StoreEntitySet="Orders">
+          <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
           <ScalarProperty Name="OrderDate" ColumnName="OrderDate" />
           <ScalarProperty Name="Address" ColumnName="Address" />
           <ScalarProperty Name="Order_ID" ColumnName="Order_ID" />

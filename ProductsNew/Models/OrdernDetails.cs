@@ -14,16 +14,13 @@ namespace ProductsNew.Models
     
     public partial class OrdernDetails
     {
-
-            public int OrderDetail_ID { get; set; }
-            public int Product_ID { get; set; }
-            public int Order_ID { get; set; }
-            public int Quantity { get; set; }
-            public decimal Price { get; set; }
-        
+        public int OrderDetail_ID { get; set; }
+        public int Product_ID { get; set; }
+        public int Order_ID { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+    
         public virtual Orders Orders { get; set; }
         public virtual Products Products { get; set; }
-
-        public IEnumerable<OrdernDetails> Details { get; set; }
     }
 }

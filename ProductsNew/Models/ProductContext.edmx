@@ -22,6 +22,7 @@
           <Property Name="Order_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Address" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="OrderDate" Type="datetime" />
+          <Property Name="TotalPrice" Type="decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="Products">
           <Key>
@@ -36,6 +37,7 @@
           <Property Name="Date" Type="datetime" />
           <Property Name="Description" Type="nvarchar" MaxLength="50" />
           <Property Name="Category" Type="nvarchar" MaxLength="50" />
+          <Property Name="ShippingPrice" Type="decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -103,6 +105,7 @@
           <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Category" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="OrdernDetails" Relationship="ProductsModel.FK_OrdernDetails_Products" FromRole="Products" ToRole="OrdernDetails" />
+          <Property Name="ShippingPrice" Type="Decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityContainer Name="ProductsContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Products" EntityType="Self.Products" />
@@ -126,6 +129,7 @@
           <Property Name="Address" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="OrderDate" Type="DateTime" Precision="3" />
           <NavigationProperty Name="OrdernDetails" Relationship="ProductsModel.FK_OrdernDetails_Orders" FromRole="Orders" ToRole="OrdernDetails" />
+          <Property Name="TotalPrice" Type="Decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -182,6 +186,7 @@
           <EntitySetMapping Name="Products">
             <EntityTypeMapping TypeName="ProductsModel.Products">
               <MappingFragment StoreEntitySet="Products">
+                <ScalarProperty Name="ShippingPrice" ColumnName="ShippingPrice" />
                 <ScalarProperty Name="Product_ID" ColumnName="Product_ID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Price" ColumnName="Price" />
@@ -197,6 +202,7 @@
           <EntitySetMapping Name="Orders">
             <EntityTypeMapping TypeName="ProductsModel.Orders">
               <MappingFragment StoreEntitySet="Orders">
+                <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
                 <ScalarProperty Name="OrderDate" ColumnName="OrderDate" />
                 <ScalarProperty Name="Address" ColumnName="Address" />
                 <ScalarProperty Name="Order_ID" ColumnName="Order_ID" />
