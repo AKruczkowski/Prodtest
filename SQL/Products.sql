@@ -1,7 +1,7 @@
 USE [TestingProducts]
 GO
 
-/****** Object:  Table [dbo].[Products]    Script Date: 05.05.2022 00:21:52 ******/
+/****** Object:  Table [dbo].[Products]    Script Date: 11.05.2022 09:50:55 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -18,6 +18,7 @@ CREATE TABLE [dbo].[Products](
 	[Date] [datetime] NULL,
 	[Description] [nvarchar](50) NULL,
 	[Category] [nvarchar](50) NULL,
+	[ShippingPrice] [decimal](10, 2) NULL,
  CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED 
 (
 	[Product_ID] ASC
