@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Data.Entity;
+using ProductsNew.Utilities;
+
 
 namespace ProductsNew.Controllers
 {
@@ -14,30 +16,27 @@ namespace ProductsNew.Controllers
     public class OrderController : ApiController
     {
         ProductsContext productsContext = new ProductsContext();
-        //Service service = new Service();
         private IService _iservice;
-
-        public OrderController(IService iservice)
+        private IOrderService _orderService;
+        public OrderController(IService iservice, IOrderService orderService)
         {
             _iservice = iservice;
+            _orderService = orderService;
         }
 
 
         public HttpResponseMessage GetOrders()
         {
-            var orders = productsContext.Orders.ToList();
+            // var orders = productsContext.Orders.ToList();
+            var orders = _orderService.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, orders);
         }
 
         // [HttpGet]
         public HttpResponseMessage GetOrders(int id)
         {
-            // var orders = productsContext.OrdernDetails.ToList(); //Include             //tabelka + poz zamówien
-            // return Request.CreateResponse(HttpStatusCode.OK, orders);
-
-            var result = productsContext.Orders.FirstOrDefault(e => e.Order_ID == id);
-
-
+            //var result = productsContext.Orders.FirstOrDefault(e => e.Order_ID == id);
+            var result = _orderService.GetOrder(id);
             if (result != null)
             {
                 return Request.CreateResponse(HttpStatusCode.OK, result);
@@ -50,15 +49,16 @@ namespace ProductsNew.Controllers
 
         public HttpResponseMessage GetOrderDetails()
         {
-            var orders = productsContext.OrdernDetails.ToList();
-
+           // var orders = productsContext.OrdernDetails.ToList();
+            var orders = _orderService.GetAllDetails();
             return Request.CreateResponse(HttpStatusCode.OK, orders);
         }
 
         //[HttpGet]
         public HttpResponseMessage GetOrderDetails(int id)
         {
-            var result = productsContext.OrdernDetails.Where(e => e.Order_ID == id).ToList();//(e => e.Order_ID == id).ToString();
+          //  var result = productsContext.OrdernDetails.Where(e => e.Order_ID == id).ToList();//(e => e.Order_ID == id).ToString();
+           var result = _orderService.GetOrderDetails(id);
 
             if (result != null)
             {
@@ -77,17 +77,18 @@ namespace ProductsNew.Controllers
 
             try
             {
-                order.OrderDate = DateTime.UtcNow;
-                productsContext.Orders.Add(order);
+                //order.OrderDate = DateTime.UtcNow;
+                //productsContext.Orders.Add(order);
 
-                productsContext.SaveChanges();
+                //productsContext.SaveChanges();
 
-                var det = order.OrdernDetails.FirstOrDefault();
-                var find = order.OrdernDetails.FirstOrDefault(e => e.Order_ID == det.Order_ID);
-                var findPrice = productsContext.Products.FirstOrDefault(e => e.Product_ID == det.Product_ID);
-                find.Price = (findPrice.Price * det.Quantity) ?? 0;            
-                productsContext.SaveChanges();
-                // order.OrdernDetails.FirstOrDefault() = det;
+                //var det = order.OrdernDetails.FirstOrDefault();
+                //var find = order.OrdernDetails.FirstOrDefault(e => e.Order_ID == det.Order_ID);
+                //var findPrice = productsContext.Products.FirstOrDefault(e => e.Product_ID == det.Product_ID);
+                //find.Price = (findPrice.Price * det.Quantity) ?? 0;            
+                //productsContext.SaveChanges();
+                //// order.OrdernDetails.FirstOrDefault() = det;
+                _orderService.AddOrder(order);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created, order);
                 response.Headers.Location = new Uri(Url.Link("DefaultApi", new { order.Order_ID }));
@@ -105,70 +106,17 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                var result = productsContext.Orders.Where(p => p.Order_ID == id).Include(x => x.OrdernDetails).FirstOrDefault();
-              
-                var orders = productsContext.OrdernDetails.Where(e => e.Order_ID == id).ToList();
-                var neworders = order.OrdernDetails.ToList();
-                if (result == null)
+                var result = _orderService.EditOrder(id, order);
+                if(result == null)
                 {
-                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Product with Id " + id.ToString() + " not found.");
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Order with Id " + id.ToString() + " not found.");
+
                 }
                 else
                 {
-                    if (order.Address != null)
-                    { result.Address = order.Address; }
-                    else { }
-                    result.OrderDate = DateTime.UtcNow;
-
-
-                    //foreach(var item in result.OrdernDetails)
-                    for(int i =0; i< orders.Count; i++)
-                    { //foreach(var item2 in order.OrdernDetails)
-                        var toBeChanged = result.OrdernDetails.ElementAtOrDefault(i);
-                        var changing = order.OrdernDetails.ElementAtOrDefault(i);
-
-
-                            if (toBeChanged.Product_ID == changing.Product_ID)
-                                if (toBeChanged.Quantity != changing.Quantity)
-                                {
-                                    if (changing.Quantity == 0)
-                                    {
-                                        
-                                    }
-                                    else
-                                    {
-                                        var findPrice = productsContext.Products.FirstOrDefault(e => e.Product_ID == toBeChanged.Product_ID);
-                                        toBeChanged.Quantity = changing.Quantity;
-                                        productsContext.SaveChanges();
-                                        toBeChanged.Price = (findPrice.Price * toBeChanged.Quantity) ?? 0;
-                                        productsContext.SaveChanges();
-                                    }   
-                                }
-
-                        
-                        // order.OrdernDetails[i] = 
-
-
-                        //if (item.Order_ID == item2.Order_ID)
-                        //{
-                        //    if (item.Quantity != item2.Quantity)
-                        //    {
-                        //        item.Quantity = item2.Quantity;
-                        //        var findPrice = productsContext.Products.FirstOrDefault(e => e.Product_ID == item.Product_ID);
-                        //        item.Price = (findPrice.Price * item.Quantity) ?? 0;
-                        //        productsContext.SaveChanges();
-                        //    }
-                        //}
-
-                    }
-
-                    //result.OrdernDetails.Clear(); // zamiast clear, porównaj quantity i podmienić record
-                    // productsContext.SaveChanges();
-                    //result.OrdernDetails = orders;
-
-                    productsContext.SaveChanges();
                     return Request.CreateResponse(HttpStatusCode.OK, result);
                 }
+
             }
             catch (Exception ex)
             {
@@ -182,7 +130,7 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                var result = productsContext.Orders.FirstOrDefault(e => e.Order_ID == id);
+                var result = _orderService.EditOrderAdress(id, order);
 
                 if (result == null)
                 {
@@ -190,13 +138,6 @@ namespace ProductsNew.Controllers
                 }
                 else
                 {
-                     if (order.Address != null)
-                    {
-                        result.Address = order.Address;
-                    }
-                    else { }
-                    result.OrderDate = DateTime.UtcNow;
-                    productsContext.SaveChanges();
                     return Request.CreateResponse(HttpStatusCode.OK, result);
                 }
             }
@@ -214,25 +155,13 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                //var result = productsContext.Orders.FirstOrDefault(e => e.Order_ID == id);
-                var result = productsContext.Orders.Where(p => p.Order_ID == id).Include(x => x.OrdernDetails).FirstOrDefault();
-                var details = productsContext.OrdernDetails.Where(p => p.Order_ID == id);
-
-                if (result == null)
+                if (!_orderService.DeleteOrders(id))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Product with ID " + id.ToString() + "not found.");
                 }
                 else
                 {
-                    foreach(var det in details)
-                    {
-                        productsContext.OrdernDetails.Remove(det);
-                        //productsContext.SaveChanges();
-                    }
-
-                    productsContext.Orders.Remove(result);
-                    productsContext.SaveChanges();
-                    return Request.CreateResponse(HttpStatusCode.Accepted, result);
+                    return Request.CreateResponse(HttpStatusCode.OK);
                 }
             }
             catch (Exception ex)
@@ -247,12 +176,13 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                var result = productsContext.Orders.FirstOrDefault(e => e.Order_ID == id);
-                var prod = productsContext.Products.FirstOrDefault(e => e.Product_ID == orderdet.Product_ID);
-                orderdet.Order_ID = result.Order_ID;
-                orderdet.Price = (orderdet.Quantity * prod.Price)??0;
-                result.OrdernDetails.Add(orderdet);
-                productsContext.SaveChanges();
+                //var result = productsContext.Orders.FirstOrDefault(e => e.Order_ID == id);
+                //var prod = productsContext.Products.FirstOrDefault(e => e.Product_ID == orderdet.Product_ID);
+                //orderdet.Order_ID = result.Order_ID;
+                //orderdet.Price = (orderdet.Quantity * prod.Price)??0;
+                //result.OrdernDetails.Add(orderdet);
+                //productsContext.SaveChanges();
+                _orderService.AddOrderDetail(id, orderdet);
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created, orderdet);
                 response.Headers.Location = new Uri(Url.Link("DefaultApi", new { orderdet.Order_ID }));
 
@@ -270,19 +200,19 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                var result = productsContext.OrdernDetails.FirstOrDefault(e => e.OrderDetail_ID == id);
-
+                //var result = productsContext.OrdernDetails.FirstOrDefault(e => e.OrderDetail_ID == id);
+                var result = _orderService.EditOrderDetail(id, order);
                 if (result == null)
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Product with Id " + id.ToString() + " not found.");
                 }
                 else
                 {
-                    var findPrice = productsContext.Products.FirstOrDefault(e => e.Product_ID == result.Product_ID);
+                    //var findPrice = productsContext.Products.FirstOrDefault(e => e.Product_ID == result.Product_ID);
                    
-                    result.Quantity = order.Quantity;;
-                    result.Price = (findPrice.Price * order.Quantity)??0;
-                    productsContext.SaveChanges();
+                    //result.Quantity = order.Quantity;;
+                    //result.Price = (findPrice.Price * order.Quantity)??0;
+                    //productsContext.SaveChanges();
                     return Request.CreateResponse(HttpStatusCode.OK, result);
                 }
             }
@@ -292,21 +222,23 @@ namespace ProductsNew.Controllers
             }
         }
 
+        // ///////////////////////////////
+
         [HttpPost]
         public HttpResponseMessage DeleteOrderDetail(int id)
         {
             try
             {
-                var result = productsContext.OrdernDetails.FirstOrDefault(e => e.OrderDetail_ID == id);
+               // var result = productsContext.OrdernDetails.FirstOrDefault(e => e.OrderDetail_ID == id);
 
-                if (result == null)
+                if (!_orderService.DeleteOrderDetail(id))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Partial order with ID " + id.ToString() + "not found.");
                 }
                 else
                 {
-                    productsContext.OrdernDetails.Remove(result);
-                    productsContext.SaveChanges();
+                    //productsContext.OrdernDetails.Remove(result);
+                    //productsContext.SaveChanges();
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
             }

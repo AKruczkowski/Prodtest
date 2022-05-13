@@ -206,6 +206,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\IOrderService.cs" />
+    <Compile Include="Utilities\IProductsService.cs" />
     <Compile Include="Utilities\IService.cs" />
     <Compile Include="Models\OrdernDetails.cs">
       <DependentUpon>ProductContext.tt</DependentUpon>
@@ -235,6 +237,8 @@
       <DependentUpon>ProductContext.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\OrderService.cs" />
+    <Compile Include="Utilities\ProductsService.cs" />
     <Compile Include="Utilities\Service.cs" />
   </ItemGroup>
   <ItemGroup>

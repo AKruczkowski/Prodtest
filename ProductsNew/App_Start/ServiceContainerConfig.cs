@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,8 @@ using ProductsNew;
 using System.Reflection;
 using System.Web.Http;
 using Autofac.Integration.WebApi;
+using System.Web.Mvc;
+using ProductsNew.Utilities;
 
 namespace ProductsNew.App_Start
 {
@@ -16,17 +19,18 @@ namespace ProductsNew.App_Start
         public static IContainer Configure()
         {
             var builder = new ContainerBuilder();
+            builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+           // builder.RegisterModule(new AutofacModule());
             var config = GlobalConfiguration.Configuration;
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-            var container = builder.Build();    
+            builder.RegisterType<ProductsService>().As<IProductsService>();
             builder.RegisterType<Service>().As<IService>();
-            config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            builder.RegisterType<OrderService>().As<IOrderService>();
 
-            //builder.RegisterAssemblyTypes(Assembly.Load(nameof(ProductsNew)))
-            //    .Where(t => t.Namespace.Contains("Utilities"))
-            //    .As(t => t.GetInterfaces().FirstOrDefault(i => i.Name == "I"+t.Name));
+            var container = builder.Build();
+            GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            return container;
 
-            return container;// builder.Build();
         }
     }
 }

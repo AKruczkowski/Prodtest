@@ -1,12 +1,14 @@
 ﻿using ProductsNew.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+//using System.Collections.Generic;
+//using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using Autofac;
+//using Autofac;
+//using ProductsNew.App_Start;
+using ProductsNew.Utilities;
 //using System.Globalization;
 
 namespace ProductsNew.Controllers
@@ -18,22 +20,20 @@ namespace ProductsNew.Controllers
 
         ProductsContext productsContext = new ProductsContext();
         private IService _iservice;
+        private IProductsService productsService;
 
-        public ProductsController(IService iservice)
+        public ProductsController(IService service, IProductsService productsService)
         {
-            _iservice = iservice;
+            _iservice = service;
+            this.productsService = productsService;
         }
 
         // GET: api/Products
         [Route("GetProducts")]
         public HttpResponseMessage Get()
         {
-            var products = productsContext.Products.ToList();
-            //.Include(p => p.OrdernDetails).AsEnumerable();
-            foreach (var product in products)
-            {
-               int x = product.OrdernDetails.Count;
-            }
+            // var products = productsContext.Products.ToList();
+            var products = productsService.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, products);
         }
 
@@ -42,15 +42,13 @@ namespace ProductsNew.Controllers
         [Route("GetProduct")]
         public HttpResponseMessage Get(int id)
         {
-            var result = productsContext.Products.FirstOrDefault(e => e.Product_ID == id);
+           // var result = productsContext.Products.FirstOrDefault(e => e.Product_ID == id);
+           var result = productsService.Get(id);
+
             if(result != null)
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, result);
-            }
+            {return Request.CreateResponse(HttpStatusCode.OK, result);  }
             else
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound, "Product with ID " + id.ToString() + "not found.");
-            }
+            { return Request.CreateResponse(HttpStatusCode.NotFound, "Product with ID " + id.ToString() + "not found.");}
         }
 
         // POST: api/Products
@@ -87,30 +85,15 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                var result = productsContext.Products.FirstOrDefault(e => e.Product_ID == id);
+                var result = productsService.Put(id, value);
+
                 if (result == null)
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Product with Id " + id.ToString() + " not found.");
                 }
                 else
-                    {
-                    result.Name = value.Name;
-                    result.Description = value.Description;
-                    result.Price = value.Price;
-                    result.Height = value.Height;
-                    result.Width = value.Width;
-                    result.Date = value.Date;
-                    result.Length = value.Length;
-                    result.Date = DateTime.Now;
-                    result.Category = value.Category;
-
-                    result.ShippingPrice = _iservice.EstimatePrice(_iservice.EstimateVolume(result.Height ?? 0, result.Length ?? 0, result.Width ?? 0));
-
-                    productsContext.SaveChanges();
-
-                    return Request.CreateResponse(HttpStatusCode.OK, result);
-                    }
-                }
+                { return Request.CreateResponse(HttpStatusCode.OK, result); }   
+            }
             catch(Exception ex)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, ex);
@@ -124,15 +107,16 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                var result = productsContext.Products.FirstOrDefault(e => e.Product_ID == id);
-                if(result == null)
+               // var result = productsContext.Products.FirstOrDefault(e => e.Product_ID == id);
+
+                if(!productsService.Delete(id))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Product with ID " + id.ToString() + "not found.");
                 }
                 else
                 {
-                    productsContext.Products.Remove(result);
-                    productsContext.SaveChanges();
+                    //productsContext.Products.Remove(result);
+                    //productsContext.SaveChanges();
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
             }
