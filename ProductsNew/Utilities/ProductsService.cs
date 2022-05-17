@@ -15,9 +15,10 @@ namespace ProductsNew.Utilities
         ProductsContext productsContext = new ProductsContext();
         private IService _iservice;
 
-        public ProductsService(IService service)
+        public ProductsService(IService service)//, ProductsContext context)
         {
             _iservice = service;
+          //  productsContext = context;
         }
 
         public List<Products> GetAll()

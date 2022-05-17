@@ -24,7 +24,7 @@ namespace ProductsNew.App_Start
             var config = GlobalConfiguration.Configuration;
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
             builder.RegisterType<ProductsService>().As<IProductsService>();
-            builder.RegisterType<Service>().As<IService>();
+            builder.RegisterType<ProductsNew.Utilities.Service>().As<IService>();
             builder.RegisterType<OrderService>().As<IOrderService>();
 
             var container = builder.Build();

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace ProductsNew
+namespace ProductsNew.Utilities
+
 {
 
     public class Service : IService

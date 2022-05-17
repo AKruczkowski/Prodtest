@@ -1,4 +1,4 @@
-﻿namespace ProductsNew
+﻿namespace ProductsNew.Utilities
 {
     public interface IService
     {

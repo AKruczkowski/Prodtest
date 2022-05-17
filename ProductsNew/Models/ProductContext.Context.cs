@@ -15,6 +15,10 @@ namespace ProductsNew.Models
     
     public partial class ProductsContext : DbContext
     {
+        //static ProductsContext()
+        //{
+        //    Database.SetInitializer<ProductsContext>(null);
+        //}
         public ProductsContext()
             : base("name=ProductsContext")
         {
