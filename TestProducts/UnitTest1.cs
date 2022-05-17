@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 using ProductsNew.Models;
 using ProductsNew.Controllers;
 using ProductsNew.Utilities;
-using ProductsNew.App_Start;
 using System.Web.Http.Routing;
 using Moq;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using ProductsNew;
 using System.Linq;
 
 //using ProductsNew.App_Start;
@@ -20,244 +17,212 @@ using System.Linq;
 
 namespace TestProducts
 {
+    public class ProductContext : DbContext
+    {
+        public virtual DbSet<Products> Products { get; set; }
+        public virtual DbSet<Orders> Orders { get; set; }
+        public virtual DbSet<OrdernDetails> OrdernDetails { get; set; }
+
+    }
+
+
     [TestClass]
     public class UnitTest1
     {
 
+          [TestMethod]
+        public void Price_ShouldReturn40()
+        {
+            var price = 40;
+            var volume1 = 1001;
+
+            var mock = new Mock<Service>();
+
+            var vol = mock.Object.EstimatePrice(volume1);
+
+            Assert.AreEqual(40, price);
+
+        }
+          [TestMethod]
+        public void Volume_EstimatedVolume()
+        {
+            var result = 6000;
+            decimal d1 = 10;
+            decimal d2 = 20;
+            decimal d3 = 30;
+
+            var mock = new Mock<Service>();
+
+            var vol = mock.Object.EstimateVolume(d1, d2, d3);
+
+            Assert.AreEqual(vol, result);
+
+        }
+         [TestMethod]
+        public void Volume_ReturnZero()
+        {
+            decimal d1 = 10;
+            decimal d2 = 0;
+            decimal d3 = 30;
+
+            var mock = new Mock<Service>();
+
+            var vol = mock.Object.EstimateVolume(d1, d2, d3);
+
+            Assert.AreEqual(vol, 0);
+
+        }
+        /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         [TestMethod]
-        public void GetProducts()
-        {   
+        public void GetProducts_GetAll()
+        {
+            var testProd = new List<Products>
+            {
+
+                 new Products { Product_ID = 11, Name = "Test2", Price = 20, Width = 30, Height = 20, Length = 30, Date = DateTime.Now, ShippingPrice = 40 },
+                 new Products { Product_ID = 12, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category = "Box" }
+
+            }.AsQueryable();
+
+            var mockSet = new Mock<DbSet<Products>>();
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Provider).Returns(testProd.Provider);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Expression).Returns(testProd.Expression);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.ElementType).Returns(testProd.ElementType);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.GetEnumerator()).Returns(testProd.GetEnumerator());
+
+
             var context = new Mock<ProductsContext>();
-            IService servInt;
+             context.Setup(c => c.Products).Returns(mockSet.Object);
+
             Service serv = new Service();
-            var products = GetTestProducts();
-            //var queryable = products.AsQueryable();
-            //context.Object.Products.Attach(products[0]);
-            //context.As<IQueryable<Products>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            //context.As<IQueryable<Products>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            //context.As<IQueryable<Products>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            //context.As<IQueryable<Products>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-
-           // context.Setup(x => x.Products.Add(It.IsAny<Products>())).Callback<Products>((s) => products.Add(s));
-
-            //context.SetupAllProperties();
-
-            var Prodservice = new ProductsService(serv);//,context.Object);
-
-           // Products product = new Products() { Product_ID = 5, Name = "Test1", Price = 10, Width = 10, Height = 10, Length = 10, Date = DateTime.Now, ShippingPrice = 20 };
-           // Prodservice.Post(product);
+            var Prodservice = new ProductsService(serv, context.Object);
 
             var listofProd = Prodservice.GetAll();
             Assert.IsNotNull(listofProd);
-            Assert.AreEqual(13, listofProd.Count);
+            Assert.AreEqual(2, listofProd.Count);
         }
 
+
         [TestMethod]
+        public void GetProduct_GetOne()
+        {
+            var testProd = new List<Products>
+            {
+
+                 new Products { Product_ID = 11, Name = "Test2", Price = 20, Width = 30, Height = 20, Length = 30, Date = DateTime.Now, ShippingPrice = 40 },
+                 new Products { Product_ID = 12, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category = "Box" }
+
+            }.AsQueryable();
+
+            var mockSet = new Mock<DbSet<Products>>();
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Provider).Returns(testProd.Provider);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Expression).Returns(testProd.Expression);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.ElementType).Returns(testProd.ElementType);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.GetEnumerator()).Returns(testProd.GetEnumerator());
+
+
+            var context = new Mock<ProductsContext>();
+            context.Setup(c => c.Products).Returns(mockSet.Object);
+
+            Service serv = new Service();
+            var Prodservice = new ProductsService(serv, context.Object);
+
+            var listofProd = Prodservice.Get(11);
+            Assert.IsNotNull(listofProd);
+        }
+
+
+
+         [TestMethod]
         public void PostProduct_AddOne()
         {
+            var testProd = new List<Products>
+            {
+
+                 new Products { Product_ID = 11, Name = "Test2", Price = 20, Width = 30, Height = 20, Length = 30, Date = DateTime.Now, ShippingPrice = 40 },
+                 new Products { Product_ID = 12, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category = "Box" }
+
+            }.AsQueryable();
+
+            var mockSet = new Mock<DbSet<Products>>();
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Provider).Returns(testProd.Provider);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Expression).Returns(testProd.Expression);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.ElementType).Returns(testProd.ElementType);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.GetEnumerator()).Returns(testProd.GetEnumerator());
+
+
             var context = new Mock<ProductsContext>();
-            IService servInt;
+            context.Setup(c => c.Products).Returns(mockSet.Object);
+
             Service serv = new Service();
-            var products = GetTestProducts();
-            //context.Object.Products.Attach(products[0]);
-            context.Setup(x => x.Products);
+            var Prodservice = new ProductsService(serv, context.Object);
 
-            context.SetupAllProperties();
+            Products prod = new Products { Product_ID = 12, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category = "Box" };
 
-            var Prodservice = new ProductsService(serv);//,context.Object);
-
-             Products product = new Products() { Product_ID = 5, Name = "Test1", Price = 10, Width = 10, Height = 10, Length = 10, Date = DateTime.Now, ShippingPrice = 20 };
-             Prodservice.Post(product);
-
-            var listofProd = Prodservice.Get(5);
-            Assert.IsNotNull(listofProd);
-           Assert.AreEqual(product.Name,listofProd.Name);
-            //Assert.AreEqual(13, listofProd.Count);
+           Prodservice.Post(prod);
+            Assert.IsInstanceOfType(prod, typeof(Products));
         }
-        [TestMethod]
-        public void PostProduct_ShouldntAdd()
-        {
-            var context = new Mock<ProductsContext>();
-            IService servInt;
-            Service serv = new Service();
-            var products = GetTestProducts();
-            //context.Object.Products.Attach(products[0]);
-            context.Setup(x => x.Products);
-
-            context.SetupAllProperties();
-
-            var Prodservice = new ProductsService(serv);//,context.Object);
-
-            Products product = new Products();// { Product_ID = 5, Name = "Test1", Price = 10, Width = 10, Height = 10, Length = 10, Date = DateTime.Now, ShippingPrice = 20 };
-            Prodservice.Post(product);
-
-            var listofProd = Prodservice.Get(5);
-            Assert.IsNotNull(listofProd);
-            Assert.AreEqual(product.Name, listofProd.Name);
-            //Assert.AreEqual(13, listofProd.Count);
-        }
-
-
-
-
-
-
-
-        private List<Products> GetTestProducts()
-        {
-            var testProd = new List<Products>();
-            testProd.Add(new Products { Product_ID = 10, Name = "Test1", Price = 10, Width = 10, Height = 10, Length = 10, Date = DateTime.Now, ShippingPrice = 20 });
-            testProd.Add(new Products { Product_ID = 11, Name = "Test2", Price = 20, Width = 30, Height = 20, Length = 30, Date = DateTime.Now, ShippingPrice = 40 });
-            testProd.Add(new Products { Product_ID = 12, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category = "Box" });
-            return testProd;
-        }
-
 
         [TestMethod]
         public void DelProduct_ShouldReturnTrue()
         {
+            var testProd = new List<Products>
+            {
+
+                 new Products { Product_ID = 11, Name = "Test2", Price = 20, Width = 30, Height = 20, Length = 30, Date = DateTime.Now, ShippingPrice = 40 },
+                 new Products { Product_ID = 12, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category = "Box" }
+
+            }.AsQueryable();
+
+            var mockSet = new Mock<DbSet<Products>>();
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Provider).Returns(testProd.Provider);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Expression).Returns(testProd.Expression);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.ElementType).Returns(testProd.ElementType);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.GetEnumerator()).Returns(testProd.GetEnumerator());
+
 
             var context = new Mock<ProductsContext>();
-            IService servInt;
+            context.Setup(c => c.Products).Returns(mockSet.Object);
+
             Service serv = new Service();
-            var products = GetTestProducts();
-            //context.Object.Products.Attach(products[0]);
-            context.Setup(x => x.Products);
+            var Prodservice = new ProductsService(serv, context.Object);
 
-            context.SetupAllProperties();
-            var Prodservice = new ProductsService(serv);//,context.Object);
-            var response = Prodservice.Delete(5);
-
+           var response = Prodservice.Delete(11);
             Assert.IsTrue(response);
 
         }
+
         [TestMethod]
         public void DelProduct_ShouldReturnFalse()
         {
 
-            var context = new Mock<ProductsContext>();
-            IService servInt;
-            Service serv = new Service();
-            var products = GetTestProducts();
-            //context.Object.Products.Attach(products[0]);
-            context.Setup(x => x.Products);
+            var testProd = new List<Products>
+            {
 
-            context.SetupAllProperties();
-            var Prodservice = new ProductsService(serv);//,context.Object);
+                 new Products { Product_ID = 11, Name = "Test2", Price = 20, Width = 30, Height = 20, Length = 30, Date = DateTime.Now, ShippingPrice = 40 },
+                 new Products { Product_ID = 12, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category = "Box" }
+
+            }.AsQueryable();
+
+            var mockSet = new Mock<DbSet<Products>>();
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Provider).Returns(testProd.Provider);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.Expression).Returns(testProd.Expression);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.ElementType).Returns(testProd.ElementType);
+            mockSet.As<IQueryable<Products>>().Setup(m => m.GetEnumerator()).Returns(testProd.GetEnumerator());
+
+
+            var context = new Mock<ProductsContext>();
+            context.Setup(c => c.Products).Returns(mockSet.Object);
+
+            Service serv = new Service();
+            var Prodservice = new ProductsService(serv, context.Object);
+
             var response = Prodservice.Delete(999);
 
             Assert.IsFalse(response);
 
         }
-        [TestMethod]
-        public void EditProduct_EqualNamesAftChange()
-        {
-
-            var context = new Mock<ProductsContext>();
-            IService servInt;
-            Service serv = new Service();
-            var products = GetTestProducts();
-            //context.Object.Products.Attach(products[0]);
-            context.Setup(x => x.Products);
-
-            context.SetupAllProperties();
-            var Prodservice = new ProductsService(serv);//,context.Object);
-
-            Products product = new Products() { Product_ID = 5, Name = "Test3", Price = 10, Width = 10, Height = 10, Length = 10, Date = DateTime.Now, ShippingPrice = 20 };
-            Prodservice.Put(product.Product_ID,product);
-
-            var listofProd = Prodservice.Get(5);
-            Assert.IsNotNull(listofProd);
-            Assert.AreEqual(product.Name, listofProd.Name);
-        }
-
-        [TestMethod]
-        public void EditProduct_CouldntFindObjToEdit()
-        {
-
-            var context = new Mock<ProductsContext>();
-            IService servInt;
-            Service serv = new Service();
-            var products = GetTestProducts();
-            //context.Object.Products.Attach(products[0]);
-            context.Setup(x => x.Products);
-
-            context.SetupAllProperties();
-            var Prodservice = new ProductsService(serv);//,context.Object);
-
-            Products product = new Products() {Name = "Test3", Price = 10, Width = 10, Height = 10, Length = 10, Date = DateTime.Now, ShippingPrice = 20 };
-            Prodservice.Put(product.Product_ID, product);
-
-            var listofProd = Prodservice.Get(5);
-            Assert.IsNull(listofProd);
-            //Assert.AreEqual(product.Name, listofProd.Name);
-        }
-
-        [TestMethod]
-        public void EditProduct_DimensionsChanged()
-        {
-
-            var context = new Mock<ProductsContext>();
-            IService servInt;
-            Service serv = new Service();
-            var products = GetTestProducts();
-            //context.Object.Products.Attach(products[0]);
-            context.Setup(x => x.Products);
-
-            context.SetupAllProperties();
-            var Prodservice = new ProductsService(serv);//,context.Object);
-
-            Products product = new Products() { Product_ID = 5, Width = 10, Height = 10, Length = 10};
-            Prodservice.Put(product.Product_ID, product);
-
-            var listofProd = Prodservice.Get(5);
-            Assert.IsNotNull(listofProd);
-            Assert.AreEqual(product.Width, listofProd.Width);
-        }
-        //[TestMethod]
-        //public void GetAll()
-        //{
-        //    Service service = new Service();
-        //    ProductsService _service = new ProductsService(service);
-        //    var controller = new ProductsController(service, _service);
-
-        //   // System.Net.WebProxy proxy = new System.Net.WebProxy();
-        //    //proxy = null;
-        //    controller.Request = new HttpRequestMessage
-        //    {
-        //        RequestUri = new Uri("http://localhost:50586/api/Products/GetProducts")
-
-        //    };
-        //    controller.Configuration = new HttpConfiguration();
-        //    controller.Configuration.Routes.MapHttpRoute(
-        //        name: "DefaultApi",
-        //        routeTemplate: "api/{controller}/{action}/{id}",
-        //        defaults: new { id = RouteParameter.Optional });
-
-        //    controller.RequestContext.RouteData = new HttpRouteData(
-        //        route: new HttpRoute(),
-        //        values: new HttpRouteValueDictionary { { "controller", "products" } });
-
-
-        //    var response = controller.Get();
-        //   // var count = response.
-        //    Assert.AreEqual(response.StatusCode, 200);
-
-        //}
     }
-
-
-
-    //private List<Products> GetTestProducts()
-    //{
-    //    var testProd = new List<Products>();
-    //    testProd.Add(new Products { Product_ID = 3, Name = "Test1", Price = 10, Width = 10, Height = 10, Length = 10, Date = DateTime.Now, ShippingPrice = 20 }) ;
-    //    testProd.Add(new Products { Product_ID = 4, Name = "Test2", Price = 20, Width = 30, Height = 20, Length = 30, Date = DateTime.Now, ShippingPrice = 40 });
-    //    testProd.Add(new Products { Product_ID = 6, Name = "Test3", Price = 3.99M, Width = 50, Height = 5, Length = 10, Date = DateTime.Now, ShippingPrice = 10, Category="Box" }); 
-
-
-    //    return testProd;
-    //}
-
 }
 

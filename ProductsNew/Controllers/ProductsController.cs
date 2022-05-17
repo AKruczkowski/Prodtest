@@ -18,7 +18,6 @@ namespace ProductsNew.Controllers
     public class ProductsController : ApiController
     {
 
-        ProductsContext productsContext = new ProductsContext();
         private IService _iservice;
         private IProductsService productsService;
 
@@ -26,6 +25,7 @@ namespace ProductsNew.Controllers
         {
             _iservice = service;
             this.productsService = productsService;
+
         }
 
         // GET: api/Products
@@ -34,7 +34,7 @@ namespace ProductsNew.Controllers
         {
             // var products = productsContext.Products.ToList();
             var products = productsService.GetAll();
-            return Request.CreateResponse(HttpStatusCode.OK, products);
+           return Request.CreateResponse(HttpStatusCode.OK, products);
         }
 
 
@@ -57,14 +57,7 @@ namespace ProductsNew.Controllers
         {
             try
             {
-                //
-                productsContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Products ON");
-                product.ShippingPrice = _iservice.EstimatePrice(_iservice.EstimateVolume(product.Height??0, product.Length??0, product.Width??0));
-                productsContext.Products.Add(product);
-                productsContext.SaveChanges();
-                productsContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Products OFF");
-                //_iservice.EstimateVolume
-
+                productsService.Post(product); 
                 var message = Request.CreateResponse(HttpStatusCode.Created, product);
                 message.Headers.Location = new Uri(Request.RequestUri + "/"+ product.Product_ID.ToString());
 

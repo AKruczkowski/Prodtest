@@ -86,3 +86,6 @@ C:\Users\AdamKruczkowski\source\repos\ProductsNew\TestProducts\bin\Debug\Castle.
 C:\Users\AdamKruczkowski\source\repos\ProductsNew\TestProducts\bin\Debug\Moq.dll
 C:\Users\AdamKruczkowski\source\repos\ProductsNew\TestProducts\bin\Debug\Castle.Core.xml
 C:\Users\AdamKruczkowski\source\repos\ProductsNew\TestProducts\bin\Debug\Moq.xml
+C:\Users\AdamKruczkowski\source\repos\ProductsNew\TestProducts\bin\Debug\Autofac.Extras.Moq.dll
+C:\Users\AdamKruczkowski\source\repos\ProductsNew\TestProducts\bin\Debug\Autofac.Extras.Moq.pdb
+C:\Users\AdamKruczkowski\source\repos\ProductsNew\TestProducts\bin\Debug\Autofac.Extras.Moq.xml

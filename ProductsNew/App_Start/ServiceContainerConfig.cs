@@ -10,6 +10,7 @@ using System.Web.Http;
 using Autofac.Integration.WebApi;
 using System.Web.Mvc;
 using ProductsNew.Utilities;
+using ProductsNew.Models;
 
 namespace ProductsNew.App_Start
 {
@@ -20,13 +21,13 @@ namespace ProductsNew.App_Start
         {
             var builder = new ContainerBuilder();
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-           // builder.RegisterModule(new AutofacModule());
+            // builder.RegisterModule(new AutofacModule());
             var config = GlobalConfiguration.Configuration;
+            builder.RegisterType<ProductsContext>();
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
             builder.RegisterType<ProductsService>().As<IProductsService>();
             builder.RegisterType<ProductsNew.Utilities.Service>().As<IService>();
             builder.RegisterType<OrderService>().As<IOrderService>();
-
             var container = builder.Build();
             GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
             return container;

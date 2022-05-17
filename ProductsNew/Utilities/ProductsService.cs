@@ -12,13 +12,13 @@ namespace ProductsNew.Utilities
     public class ProductsService : IProductsService
     {
 
-        ProductsContext productsContext = new ProductsContext();
+        private ProductsContext productsContext;// = new ProductsContext();
         private IService _iservice;
 
-        public ProductsService(IService service)//, ProductsContext context)
+        public ProductsService(IService service, ProductsContext context)
         {
             _iservice = service;
-          //  productsContext = context;
+           productsContext = context;
         }
 
         public List<Products> GetAll()
